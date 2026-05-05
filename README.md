@@ -48,11 +48,26 @@ pip install -r requirements.txt
 5. Run the API
 
 ```bash
-fastapi dev main.py
+fastapi dev app/main.py
 ```
 
 6. Open the API docs
 
 ```bash
 http://127.0.0.1:8000/docs
+```
+
+## Project Structure
+
+```text
+job-application-tracker-api/
+├── app/
+│   ├── main.py
+│   ├── schemas.py
+│   ├── storage.py
+│   └── routers/
+│       └── applications.py
+├── README.md
+├── requirements.txt
+└── .gitignore
 ```

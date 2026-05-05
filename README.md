@@ -16,6 +16,8 @@ A beginner-friendly FastAPI project for tracking job applications.
 - Python
 - FastAPI
 - Pydantic
+- SQLite
+- SQLAlchemy
 
 ## How to Run
 
@@ -62,9 +64,28 @@ http://127.0.0.1:8000/docs
 ```text
 job-application-tracker-api/
 ├── app/
+│   ├── database.py
 │   ├── main.py
+│   ├── models.py
 │   ├── schemas.py
-│   ├── storage.py
+│   ├── crud.py
+│   └── routers/
+│       └── applications.py
+├── README.md
+├── requirements.txt
+└── .gitignore
+```
+
+## Project Structure
+
+```text
+job-application-tracker-api/
+├── app/
+│   ├── database.py
+│   ├── main.py
+│   ├── models.py
+│   ├── schemas.py
+│   ├── crud.py
 │   └── routers/
 │       └── applications.py
 ├── README.md

@@ -76,19 +76,9 @@ job-application-tracker-api/
 └── .gitignore
 ```
 
-## Project Structure
+## Database
 
-```text
-job-application-tracker-api/
-├── app/
-│   ├── database.py
-│   ├── main.py
-│   ├── models.py
-│   ├── schemas.py
-│   ├── crud.py
-│   └── routers/
-│       └── applications.py
-├── README.md
-├── requirements.txt
-└── .gitignore
-```
+This project uses SQLite for local development.  
+The database file is created automatically when the app starts.
+
+Local database files are ignored by Git using `.gitignore`.

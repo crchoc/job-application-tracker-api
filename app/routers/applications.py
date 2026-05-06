@@ -1,11 +1,19 @@
-from typing import List
+from typing import List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from app import crud
 from app.database import get_db
-from app.schemas import JobApplication, JobApplicationCreate, JobApplicationUpdate
+from app.schemas import (
+    ApplicationStatus,
+    ApplicationSummary,
+    JobApplication,
+    JobApplicationCreate,
+    JobApplicationUpdate,
+    SortBy,
+    SortOrder,
+)
 
 
 router = APIRouter(
@@ -23,8 +31,52 @@ def create_application(
 
 
 @router.get("", response_model=List[JobApplication])
-def get_applications(db: Session = Depends(get_db)):
-    return crud.get_all_applications(db)
+def get_applications(
+    status: Optional[ApplicationStatus] = Query(None, description="Filter by application status"),
+    company: Optional[str] = Query(None, description="Filter by company name"),
+    location: Optional[str] = Query(None, description="Filter by location"),
+    search: Optional[str] = Query(None, description="Search company, position, location, or notes"),
+    sort_by: SortBy = Query(SortBy.id, description="Field used for sorting"),
+    sort_order: SortOrder = Query(SortOrder.asc, description="Sort order"),
+    skip: int = Query(0, ge=0, description="Number of records to skip"),
+    limit: int = Query(20, ge=1, le=100, description="Maximum number of records to return"),
+    db: Session = Depends(get_db)
+):
+    return crud.get_all_applications(
+        db=db,
+        status=status,
+        company=company,
+        location=location,
+        search=search,
+        sort_by=sort_by,
+        sort_order=sort_order,
+        skip=skip,
+        limit=limit
+    )
+
+
+@router.get("/count")
+def count_applications(
+    status: Optional[ApplicationStatus] = Query(None, description="Filter by application status"),
+    company: Optional[str] = Query(None, description="Filter by company name"),
+    location: Optional[str] = Query(None, description="Filter by location"),
+    search: Optional[str] = Query(None, description="Search company, position, location, or notes"),
+    db: Session = Depends(get_db)
+):
+    total = crud.count_applications(
+        db=db,
+        status=status,
+        company=company,
+        location=location,
+        search=search
+    )
+
+    return {"count": total}
+
+
+@router.get("/summary", response_model=ApplicationSummary)
+def get_application_summary(db: Session = Depends(get_db)):
+    return crud.get_application_summary(db)
 
 
 @router.get("/{application_id}", response_model=JobApplication)

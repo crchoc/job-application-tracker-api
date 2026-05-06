@@ -12,6 +12,19 @@ class ApplicationStatus(str, Enum):
     offer = "offer"
 
 
+class SortOrder(str, Enum):
+    asc = "asc"
+    desc = "desc"
+
+
+class SortBy(str, Enum):
+    id = "id"
+    company = "company"
+    position = "position"
+    status = "status"
+    location = "location"
+
+
 class JobApplicationCreate(BaseModel):
     company: str = Field(..., min_length=1, max_length=100)
     position: str = Field(..., min_length=1, max_length=100)
@@ -34,3 +47,12 @@ class JobApplication(JobApplicationCreate):
     id: int
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class ApplicationSummary(BaseModel):
+    total: int
+    saved: int
+    applied: int
+    interview: int
+    rejected: int
+    offer: int

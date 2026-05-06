@@ -10,7 +10,7 @@ Base.metadata.create_all(bind=engine)
 app = FastAPI(
     title="Job Application Tracker API",
     description="A simple API for tracking job applications.",
-    version="0.3.0"
+    version="0.4.0"
 )
 
 
@@ -19,7 +19,7 @@ def read_root():
     return {
         "message": "Welcome to the Job Application Tracker API",
         "docs": "/docs",
-        "version": "0.3.0"
+        "version": "0.4.0"
     }
 
 

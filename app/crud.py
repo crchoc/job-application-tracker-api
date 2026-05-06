@@ -1,9 +1,16 @@
 from typing import List, Optional
 
+from sqlalchemy import or_, func
 from sqlalchemy.orm import Session
 
 from app.models import JobApplicationModel
-from app.schemas import JobApplicationCreate, JobApplicationUpdate
+from app.schemas import (
+    ApplicationStatus,
+    JobApplicationCreate,
+    JobApplicationUpdate,
+    SortBy,
+    SortOrder,
+)
 
 
 def create_application(
@@ -26,8 +33,79 @@ def create_application(
     return new_application
 
 
-def get_all_applications(db: Session) -> List[JobApplicationModel]:
-    return db.query(JobApplicationModel).all()
+def get_all_applications(
+    db: Session,
+    status: Optional[ApplicationStatus] = None,
+    company: Optional[str] = None,
+    location: Optional[str] = None,
+    search: Optional[str] = None,
+    sort_by: SortBy = SortBy.id,
+    sort_order: SortOrder = SortOrder.asc,
+    skip: int = 0,
+    limit: int = 20
+) -> List[JobApplicationModel]:
+    query = db.query(JobApplicationModel)
+
+    if status is not None:
+        query = query.filter(JobApplicationModel.status == status.value)
+
+    if company is not None:
+        query = query.filter(JobApplicationModel.company.ilike(f"%{company}%"))
+
+    if location is not None:
+        query = query.filter(JobApplicationModel.location.ilike(f"%{location}%"))
+
+    if search is not None:
+        search_pattern = f"%{search}%"
+        query = query.filter(
+            or_(
+                JobApplicationModel.company.ilike(search_pattern),
+                JobApplicationModel.position.ilike(search_pattern),
+                JobApplicationModel.location.ilike(search_pattern),
+                JobApplicationModel.notes.ilike(search_pattern),
+            )
+        )
+
+    sort_column = getattr(JobApplicationModel, sort_by.value)
+
+    if sort_order == SortOrder.desc:
+        sort_column = sort_column.desc()
+
+    query = query.order_by(sort_column)
+
+    return query.offset(skip).limit(limit).all()
+
+
+def count_applications(
+    db: Session,
+    status: Optional[ApplicationStatus] = None,
+    company: Optional[str] = None,
+    location: Optional[str] = None,
+    search: Optional[str] = None,
+) -> int:
+    query = db.query(JobApplicationModel)
+
+    if status is not None:
+        query = query.filter(JobApplicationModel.status == status.value)
+
+    if company is not None:
+        query = query.filter(JobApplicationModel.company.ilike(f"%{company}%"))
+
+    if location is not None:
+        query = query.filter(JobApplicationModel.location.ilike(f"%{location}%"))
+
+    if search is not None:
+        search_pattern = f"%{search}%"
+        query = query.filter(
+            or_(
+                JobApplicationModel.company.ilike(search_pattern),
+                JobApplicationModel.position.ilike(search_pattern),
+                JobApplicationModel.location.ilike(search_pattern),
+                JobApplicationModel.notes.ilike(search_pattern),
+            )
+        )
+
+    return query.count()
 
 
 def get_application_by_id(
@@ -78,3 +156,31 @@ def delete_application(
     db.commit()
 
     return True
+
+
+def get_application_summary(db: Session) -> dict:
+    total = db.query(JobApplicationModel).count()
+
+    status_counts = (
+        db.query(
+            JobApplicationModel.status,
+            func.count(JobApplicationModel.id)
+        )
+        .group_by(JobApplicationModel.status)
+        .all()
+    )
+
+    summary = {
+        "total": total,
+        "saved": 0,
+        "applied": 0,
+        "interview": 0,
+        "rejected": 0,
+        "offer": 0,
+    }
+
+    for status, count in status_counts:
+        if status in summary:
+            summary[status] = count
+
+    return summary

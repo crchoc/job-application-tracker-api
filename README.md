@@ -15,6 +15,8 @@ A beginner-friendly FastAPI project for tracking job applications.
 - Sort applications by ID, company, position, status, or location
 - Use pagination with skip and limit
 - View application count and status summary
+- Automated API tests with pytest
+- Separate test database
 
 ## Tech Stack
 
@@ -23,6 +25,7 @@ A beginner-friendly FastAPI project for tracking job applications.
 - Pydantic
 - SQLite
 - SQLAlchemy
+
 
 ## How to Run
 
@@ -124,5 +127,15 @@ Get status summary:
 GET /applications/summary
 ```
 
-Current version: 0.4.0
+## Running Tests
 
+This project uses pytest and FastAPI TestClient for API testing.
+
+Run tests:
+
+```bash
+python -m pytest
+```
+
+
+Current version: 0.5.0

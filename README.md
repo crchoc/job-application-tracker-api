@@ -31,6 +31,8 @@ This project was built as a practical Python backend portfolio project. It demon
 - Pydantic
 - pytest
 - Git / GitHub
+- Docker
+- Docker Compose
 
 ---
 
@@ -211,6 +213,32 @@ http://127.0.0.1:8000/docs
 
 ---
 
+## How to Run with Docker
+
+Make sure Docker Desktop is installed and running.
+
+Build and start the API:
+
+```bash
+docker compose up --build
+```
+
+Open the API documentation:
+
+```text
+http://127.0.0.1:8000/docs
+```
+
+Stop the container:
+
+```bash
+docker compose down
+```
+
+Docker stores the SQLite database inside the local `data/` folder. This folder is ignored by Git.
+
+---
+
 ## Running Tests
 
 This project uses pytest and FastAPI TestClient for API testing.
@@ -283,6 +311,7 @@ Through this project, I practiced:
 | 0.4.0 | Search, filtering, sorting, pagination, count, and summary |
 | 0.5.0 | Automated API tests with pytest |
 | 0.6.0 | Professional README and GitHub presentation |
+| 0.7.0 | Docker and Docker Compose support |
 
 ---
 

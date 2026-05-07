@@ -1,10 +1,12 @@
 .venv/
 __pycache__/
 *.pyc
+.pytest_cache/
+.git/
+.gitignore
 .env
 .DS_Store
 .idea/
 .vscode/
 *.db
-.pytest_cache/
-data/
+screenshots/

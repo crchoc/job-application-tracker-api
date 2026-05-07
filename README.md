@@ -137,5 +137,11 @@ Run tests:
 python -m pytest
 ```
 
+## Version information
+Version 1: Basic FastAPI prototype
+Version 2: Modular project structure
+Version 3: SQLite database
+Version 4: Search, filtering, sorting, pagination
+Version 5: Automated API tests
 
 Current version: 0.5.0

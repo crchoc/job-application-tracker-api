@@ -264,7 +264,7 @@ The tests use a separate SQLite database file for testing.
 ### Interactive API Documentation
 
 ```markdown
-screenshots/api-docs.PNG
+![API Documentation](screenshots/api-docs.png)
 ```
 
 ### Example Application Endpoint

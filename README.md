@@ -263,7 +263,7 @@ The tests use a separate SQLite database file for testing.
 
 ### Interactive API Documentation
 
-![API Documentation](screenshots/api-docs.png)
+![API Documentation](screenshots/api-docs.PNG)
 
 ### Example Application Endpoint
 

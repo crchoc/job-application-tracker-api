@@ -161,7 +161,7 @@ offer
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/YOUR-GITHUB-USERNAME/job-application-tracker-api.git
+git clone https://github.com/crchoc/job-application-tracker-api.git
 cd job-application-tracker-api
 ```
 
@@ -264,7 +264,7 @@ The tests use a separate SQLite database file for testing.
 ### Interactive API Documentation
 
 ```markdown
-![API Documentation](screenshots/api-docs.PNG)
+screenshots/api-docs.PNG
 ```
 
 ### Example Application Endpoint

@@ -71,7 +71,7 @@ def test_read_root():
     response = client.get("/")
 
     assert response.status_code == 200
-    assert response.json()["version"] == "0.7.0"
+    assert response.json()["version"] == "0.8.0"
 
 
 def test_create_application():

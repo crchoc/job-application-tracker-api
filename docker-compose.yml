@@ -8,3 +8,14 @@ services:
       - ./data:/app/data
     environment:
       - DATABASE_URL=sqlite:///./data/job_tracker.db
+
+  frontend:
+    build: .
+    container_name: job-application-tracker-frontend
+    command: streamlit run frontend/streamlit_app.py --server.address=0.0.0.0 --server.port=8501
+    ports:
+      - "8501:8501"
+    environment:
+      - API_BASE_URL=http://api:8000
+    depends_on:
+      - api

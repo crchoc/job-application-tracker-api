@@ -19,6 +19,8 @@ This project was built as a practical Python backend portfolio project. It demon
 - Interactive API documentation with FastAPI Swagger UI
 - Automated API tests with pytest
 - Modular backend structure using routers, schemas, CRUD logic, and database models
+- Simple Streamlit frontend dashboard
+- Add, view, filter, search, update, and delete applications from the UI
 
 ---
 
@@ -33,6 +35,9 @@ This project was built as a practical Python backend portfolio project. It demon
 - Git / GitHub
 - Docker
 - Docker Compose
+- Streamlit
+- pandas
+- requests
 
 ---
 
@@ -41,18 +46,12 @@ This project was built as a practical Python backend portfolio project. It demon
 ```text
 job-application-tracker-api/
 ├── app/
-│   ├── __init__.py
-│   ├── crud.py
-│   ├── database.py
-│   ├── main.py
-│   ├── models.py
-│   ├── schemas.py
-│   └── routers/
-│       ├── __init__.py
-│       └── applications.py
+├── frontend/
+│   └── streamlit_app.py
 ├── tests/
-│   ├── __init__.py
-│   └── test_applications.py
+├── screenshots/
+├── Dockerfile
+├── docker-compose.yml
 ├── README.md
 ├── requirements.txt
 └── .gitignore
@@ -215,27 +214,29 @@ http://127.0.0.1:8000/docs
 
 ## How to Run with Docker
 
-Make sure Docker Desktop is installed and running.
-
-Build and start the API:
+Build and start both the FastAPI backend and Streamlit frontend:
 
 ```bash
 docker compose up --build
 ```
 
-Open the API documentation:
+Open the FastAPI documentation:
 
 ```text
 http://127.0.0.1:8000/docs
 ```
 
-Stop the container:
+Open the Streamlit frontend:
+
+```text
+http://127.0.0.1:8501
+```
+
+Stop the containers:
 
 ```bash
 docker compose down
 ```
-
-Docker stores the SQLite database inside the local `data/` folder. This folder is ignored by Git.
 
 ---
 
@@ -259,6 +260,30 @@ The tests use a separate SQLite database file for testing.
 
 ---
 
+## Frontend Dashboard
+
+This project includes a simple Streamlit frontend for interacting with the FastAPI backend.
+
+Run the backend first:
+
+```bash
+fastapi dev app/main.py
+```
+
+Then open a second terminal and run:
+
+```bash
+streamlit run frontend/streamlit_app.py
+```
+
+Open the Streamlit dashboard:
+
+```text
+http://localhost:8501
+```
+
+---
+
 ## Screenshots
 
 ### Interactive API Documentation
@@ -268,6 +293,10 @@ The tests use a separate SQLite database file for testing.
 ### Example Application Endpoint
 
 ![Applications Endpoint](screenshots/applications-endpoint.PNG)
+
+### Streamlit Dashboard
+
+![Streamlit Dashboard](screenshots/streamlit-dashboard.png)
 
 ---
 
@@ -283,6 +312,8 @@ Through this project, I practiced:
 - Implementing search, filtering, sorting, and pagination
 - Writing automated API tests with pytest
 - Managing a project with Git and GitHub
+- Creating docker container
+- Creating a simple frontend dashboard with Streamlit
 
 ---
 
@@ -308,6 +339,7 @@ Through this project, I practiced:
 | 0.5.0 | Automated API tests with pytest |
 | 0.6.0 | Professional README and GitHub presentation |
 | 0.7.0 | Docker and Docker Compose support |
+| 0.8.0 | Streamlit frontend dashboard |
 
 ---
 

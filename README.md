@@ -296,7 +296,7 @@ http://localhost:8501
 
 ### Streamlit Dashboard
 
-![Streamlit Dashboard](screenshots/streamlit-dashboard.png)
+![Streamlit Dashboard](screenshots/streamlit-dashboard.PNG)
 
 ---
 

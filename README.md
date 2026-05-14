@@ -2,14 +2,14 @@
 
 A FastAPI backend project for tracking job applications, managing application statuses, and searching/filtering saved job records.
 
-This project was built as a practical Python backend portfolio project. It demonstrates REST API development, SQLite database integration, modular project structure, CRUD operations, search/filter/sort functionality, and automated API testing.
+This project was built as a practical Python backend portfolio project. It demonstrates REST API development, PostgreSQL database integration, modular project structure, CRUD operations, search/filter/sort functionality, Docker Compose, a simple Streamlit dashboard, and automated API testing.
 
 ---
 
 ## Features
 
 - Create, read, update, and delete job applications
-- Store job applications in a SQLite database
+- Store job applications in a PostgreSQL database
 - Filter applications by status, company, and location
 - Search applications by keyword
 - Sort applications by ID, company, position, status, or location
@@ -21,6 +21,7 @@ This project was built as a practical Python backend portfolio project. It demon
 - Modular backend structure using routers, schemas, CRUD logic, and database models
 - Simple Streamlit frontend dashboard
 - Add, view, filter, search, update, and delete applications from the UI
+- Run FastAPI, PostgreSQL, and Streamlit together with Docker Compose
 
 ---
 
@@ -28,7 +29,8 @@ This project was built as a practical Python backend portfolio project. It demon
 
 - Python
 - FastAPI
-- SQLite
+- PostgreSQL
+- SQLite for testing
 - SQLAlchemy
 - Pydantic
 - pytest
@@ -319,9 +321,7 @@ Through this project, I practiced:
 
 ## Future Improvements
 
-- Add Docker support
 - Add user authentication
-- Add a simple frontend dashboard
 - Add deployment configuration
 - Add date fields such as application deadline and interview date
 - Add CSV export for saved applications
@@ -340,6 +340,7 @@ Through this project, I practiced:
 | 0.6.0 | Professional README and GitHub presentation |
 | 0.7.0 | Docker and Docker Compose support |
 | 0.8.0 | Streamlit frontend dashboard |
+| 0.9.0 | PostgreSQL database integration with Docker Compose |
 
 ---
 

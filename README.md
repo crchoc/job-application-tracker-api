@@ -1,15 +1,17 @@
 # Job Application Tracker API
 
-A FastAPI backend project for tracking job applications, managing application statuses, and searching/filtering saved job records.
+A FastAPI backend project for tracking job applications, managing application statuses, searching/filtering saved job records, and separating each user's data with JWT authentication.
 
-This project was built as a practical Python backend portfolio project. It demonstrates REST API development, PostgreSQL database integration, modular project structure, CRUD operations, search/filter/sort functionality, Docker Compose, a simple Streamlit dashboard, and automated API testing.
+This project was built as a practical Python backend portfolio project. It demonstrates REST API development, PostgreSQL database integration, JWT authentication, user-specific CRUD operations, modular project structure, Docker Compose, a simple Streamlit dashboard, and automated API testing.
 
 ---
 
 ## Features
 
+- User registration and login with JWT authentication
 - Create, read, update, and delete job applications
 - Store job applications in a PostgreSQL database
+- Keep each user's job applications separated by account
 - Filter applications by status, company, and location
 - Search applications by keyword
 - Sort applications by ID, company, position, status, or location
@@ -18,9 +20,8 @@ This project was built as a practical Python backend portfolio project. It demon
 - View application status summary
 - Interactive API documentation with FastAPI Swagger UI
 - Automated API tests with pytest
-- Modular backend structure using routers, schemas, CRUD logic, and database models
-- Simple Streamlit frontend dashboard
-- Add, view, filter, search, update, and delete applications from the UI
+- Modular backend structure using routers, schemas, CRUD logic, authentication logic, and database models
+- Simple Streamlit frontend dashboard with login/register support
 - Run FastAPI, PostgreSQL, and Streamlit together with Docker Compose
 
 ---
@@ -33,6 +34,8 @@ This project was built as a practical Python backend portfolio project. It demon
 - SQLite for testing
 - SQLAlchemy
 - Pydantic
+- JWT / PyJWT
+- pwdlib
 - pytest
 - Git / GitHub
 - Docker
@@ -48,9 +51,19 @@ This project was built as a practical Python backend portfolio project. It demon
 ```text
 job-application-tracker-api/
 ├── app/
+│   ├── routers/
+│   │   ├── applications.py
+│   │   └── auth.py
+│   ├── auth.py
+│   ├── crud.py
+│   ├── database.py
+│   ├── main.py
+│   ├── models.py
+│   └── schemas.py
 ├── frontend/
 │   └── streamlit_app.py
 ├── tests/
+│   └── test_applications.py
 ├── screenshots/
 ├── Dockerfile
 ├── docker-compose.yml
@@ -63,16 +76,62 @@ job-application-tracker-api/
 
 ## API Overview
 
+### Authentication
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/auth/register` | Register a new user |
+| `POST` | `/auth/login` | Log in and receive a JWT access token |
+| `GET` | `/auth/me` | Get the currently authenticated user |
+
+### Applications
+
+All `/applications` endpoints require JWT authentication.
+
 | Method | Endpoint | Description |
 |---|---|---|
 | `GET` | `/` | Root endpoint |
 | `POST` | `/applications` | Create a new job application |
-| `GET` | `/applications` | Get all job applications |
+| `GET` | `/applications` | Get all job applications for the current user |
 | `GET` | `/applications/{application_id}` | Get one application by ID |
 | `PATCH` | `/applications/{application_id}` | Update an application |
 | `DELETE` | `/applications/{application_id}` | Delete an application |
 | `GET` | `/applications/count` | Get total number of applications |
-| `GET` | `/applications/summary` | Get status summary |
+| `GET` | `/applications/summary` | Get application status summary |
+
+---
+
+## Example User Registration
+
+```json
+{
+  "email": "test@example.com",
+  "full_name": "Test User",
+  "password": "password123"
+}
+```
+
+---
+
+## Example Login
+
+The login endpoint uses form data.
+
+```text
+username: test@example.com
+password: password123
+```
+
+The response returns an access token:
+
+```json
+{
+  "access_token": "jwt-token-value",
+  "token_type": "bearer"
+}
+```
+
+Use the token in Swagger UI by clicking **Authorize**.
 
 ---
 
@@ -157,6 +216,41 @@ offer
 
 ---
 
+## How to Run with Docker Compose
+
+Build and start the FastAPI backend, PostgreSQL database, and Streamlit frontend:
+
+```bash
+docker compose up --build
+```
+
+Open the FastAPI documentation:
+
+```text
+http://127.0.0.1:8000/docs
+```
+
+Open the Streamlit frontend:
+
+```text
+http://127.0.0.1:8501
+```
+
+Stop the containers:
+
+```bash
+docker compose down
+```
+
+Reset the PostgreSQL volume during development:
+
+```bash
+docker compose down -v
+docker compose up --build
+```
+
+---
+
 ## How to Run Locally
 
 ### 1. Clone the repository
@@ -206,38 +300,8 @@ fastapi dev app/main.py
 
 ### 6. Open the API documentation
 
-Open this URL in your browser:
-
 ```text
 http://127.0.0.1:8000/docs
-```
-
----
-
-## How to Run with Docker
-
-Build and start both the FastAPI backend and Streamlit frontend:
-
-```bash
-docker compose up --build
-```
-
-Open the FastAPI documentation:
-
-```text
-http://127.0.0.1:8000/docs
-```
-
-Open the Streamlit frontend:
-
-```text
-http://127.0.0.1:8501
-```
-
-Stop the containers:
-
-```bash
-docker compose down
 ```
 
 ---
@@ -252,13 +316,7 @@ Run tests:
 python -m pytest
 ```
 
-Expected result:
-
-```text
-11 passed
-```
-
-The tests use a separate SQLite database file for testing.
+The tests use a separate SQLite database file for fast, isolated testing.
 
 ---
 
@@ -266,7 +324,13 @@ The tests use a separate SQLite database file for testing.
 
 This project includes a simple Streamlit frontend for interacting with the FastAPI backend.
 
-Run the backend first:
+With Docker Compose, open:
+
+```text
+http://127.0.0.1:8501
+```
+
+For local development, run the backend first:
 
 ```bash
 fastapi dev app/main.py
@@ -276,12 +340,6 @@ Then open a second terminal and run:
 
 ```bash
 streamlit run frontend/streamlit_app.py
-```
-
-Open the Streamlit dashboard:
-
-```text
-http://localhost:8501
 ```
 
 ---
@@ -309,22 +367,27 @@ Through this project, I practiced:
 - Building REST APIs with FastAPI
 - Structuring a Python backend project
 - Creating database models with SQLAlchemy
-- Using SQLite for persistent local storage
-- Separating schemas, models, routes, and CRUD logic
+- Connecting FastAPI to PostgreSQL
+- Managing database configuration with environment variables
+- Implementing JWT-based authentication
+- Hashing and verifying user passwords
+- Separating user-specific application data
+- Separating schemas, models, routes, authentication, and CRUD logic
 - Implementing search, filtering, sorting, and pagination
 - Writing automated API tests with pytest
+- Running FastAPI, PostgreSQL, and Streamlit together with Docker Compose
 - Managing a project with Git and GitHub
-- Creating docker container
 - Creating a simple frontend dashboard with Streamlit
 
 ---
 
 ## Future Improvements
 
-- Add user authentication
-- Add deployment configuration
-- Add date fields such as application deadline and interview date
+- Add Alembic database migrations
+- Add application deadline and interview date fields
 - Add CSV export for saved applications
+- Improve frontend styling and validation
+- Add refresh token support
 
 ---
 
@@ -341,9 +404,10 @@ Through this project, I practiced:
 | 0.7.0 | Docker and Docker Compose support |
 | 0.8.0 | Streamlit frontend dashboard |
 | 0.9.0 | PostgreSQL database integration with Docker Compose |
+| 1.0.0 | JWT authentication and user-specific job applications |
 
 ---
 
 ## About This Project
 
-This project was created as a beginner-friendly but practical backend portfolio project. It focuses on clean API design, database integration, testing, and clear documentation.
+This project was created as a beginner-friendly but practical backend portfolio project. It focuses on clean API design, authentication, database integration, testing, Docker-based development, and clear documentation.

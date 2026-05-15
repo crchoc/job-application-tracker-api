@@ -15,7 +15,8 @@ from app.schemas import (
 
 def create_application(
     db: Session,
-    application_data: JobApplicationCreate
+    application_data: JobApplicationCreate,
+    user_id: int
 ) -> JobApplicationModel:
     new_application = JobApplicationModel(
         company=application_data.company,
@@ -23,7 +24,8 @@ def create_application(
         status=application_data.status.value,
         job_url=application_data.job_url,
         location=application_data.location,
-        notes=application_data.notes
+        notes=application_data.notes,
+        user_id=user_id
     )
 
     db.add(new_application)
@@ -35,6 +37,7 @@ def create_application(
 
 def get_all_applications(
     db: Session,
+    user_id: int,
     status: Optional[ApplicationStatus] = None,
     company: Optional[str] = None,
     location: Optional[str] = None,
@@ -44,7 +47,9 @@ def get_all_applications(
     skip: int = 0,
     limit: int = 20
 ) -> List[JobApplicationModel]:
-    query = db.query(JobApplicationModel)
+    query = db.query(JobApplicationModel).filter(
+        JobApplicationModel.user_id == user_id
+    )
 
     if status is not None:
         query = query.filter(JobApplicationModel.status == status.value)
@@ -78,12 +83,15 @@ def get_all_applications(
 
 def count_applications(
     db: Session,
+    user_id: int,
     status: Optional[ApplicationStatus] = None,
     company: Optional[str] = None,
     location: Optional[str] = None,
     search: Optional[str] = None,
 ) -> int:
-    query = db.query(JobApplicationModel)
+    query = db.query(JobApplicationModel).filter(
+        JobApplicationModel.user_id == user_id
+    )
 
     if status is not None:
         query = query.filter(JobApplicationModel.status == status.value)
@@ -110,11 +118,15 @@ def count_applications(
 
 def get_application_by_id(
     db: Session,
-    application_id: int
+    application_id: int,
+    user_id: int
 ) -> Optional[JobApplicationModel]:
     return (
         db.query(JobApplicationModel)
-        .filter(JobApplicationModel.id == application_id)
+        .filter(
+            JobApplicationModel.id == application_id,
+            JobApplicationModel.user_id == user_id
+        )
         .first()
     )
 
@@ -122,9 +134,14 @@ def get_application_by_id(
 def update_application(
     db: Session,
     application_id: int,
-    update_data: JobApplicationUpdate
+    update_data: JobApplicationUpdate,
+    user_id: int
 ) -> Optional[JobApplicationModel]:
-    application = get_application_by_id(db, application_id)
+    application = get_application_by_id(
+        db=db,
+        application_id=application_id,
+        user_id=user_id
+    )
 
     if application is None:
         return None
@@ -145,9 +162,14 @@ def update_application(
 
 def delete_application(
     db: Session,
-    application_id: int
+    application_id: int,
+    user_id: int
 ) -> bool:
-    application = get_application_by_id(db, application_id)
+    application = get_application_by_id(
+        db=db,
+        application_id=application_id,
+        user_id=user_id
+    )
 
     if application is None:
         return False
@@ -158,14 +180,22 @@ def delete_application(
     return True
 
 
-def get_application_summary(db: Session) -> dict:
-    total = db.query(JobApplicationModel).count()
+def get_application_summary(
+    db: Session,
+    user_id: int
+) -> dict:
+    total = (
+        db.query(JobApplicationModel)
+        .filter(JobApplicationModel.user_id == user_id)
+        .count()
+    )
 
     status_counts = (
         db.query(
             JobApplicationModel.status,
             func.count(JobApplicationModel.id)
         )
+        .filter(JobApplicationModel.user_id == user_id)
         .group_by(JobApplicationModel.status)
         .all()
     )

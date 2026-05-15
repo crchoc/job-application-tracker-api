@@ -19,8 +19,65 @@ st.title("💼 Job Application Tracker")
 st.write("A simple dashboard for managing job applications.")
 
 
+if "access_token" not in st.session_state:
+    st.session_state.access_token = None
+
+if "user_email" not in st.session_state:
+    st.session_state.user_email = None
+
+
+def get_auth_headers():
+    if not st.session_state.access_token:
+        return {}
+
+    return {
+        "Authorization": f"Bearer {st.session_state.access_token}"
+    }
+
+
+def register_user(email, full_name, password):
+    response = requests.post(
+        f"{API_BASE_URL}/auth/register",
+        json={
+            "email": email,
+            "full_name": full_name or None,
+            "password": password
+        },
+        timeout=10
+    )
+    response.raise_for_status()
+    return response.json()
+
+
+def login_user(email, password):
+    response = requests.post(
+        f"{API_BASE_URL}/auth/login",
+        data={
+            "username": email,
+            "password": password
+        },
+        timeout=10
+    )
+    response.raise_for_status()
+    return response.json()
+
+
+def get_current_user():
+    response = requests.get(
+        f"{API_BASE_URL}/auth/me",
+        headers=get_auth_headers(),
+        timeout=10
+    )
+    response.raise_for_status()
+    return response.json()
+
+
 def get_summary():
-    response = requests.get(f"{API_BASE_URL}/applications/summary", timeout=10)
+    response = requests.get(
+        f"{API_BASE_URL}/applications/summary",
+        headers=get_auth_headers(),
+        timeout=10
+    )
     response.raise_for_status()
     return response.json()
 
@@ -41,6 +98,7 @@ def get_applications(status=None, search=None):
     response = requests.get(
         f"{API_BASE_URL}/applications",
         params=params,
+        headers=get_auth_headers(),
         timeout=10
     )
     response.raise_for_status()
@@ -51,6 +109,7 @@ def create_application(payload):
     response = requests.post(
         f"{API_BASE_URL}/applications",
         json=payload,
+        headers=get_auth_headers(),
         timeout=10
     )
     response.raise_for_status()
@@ -61,6 +120,7 @@ def update_application(application_id, payload):
     response = requests.patch(
         f"{API_BASE_URL}/applications/{application_id}",
         json=payload,
+        headers=get_auth_headers(),
         timeout=10
     )
     response.raise_for_status()
@@ -70,10 +130,104 @@ def update_application(application_id, payload):
 def delete_application(application_id):
     response = requests.delete(
         f"{API_BASE_URL}/applications/{application_id}",
+        headers=get_auth_headers(),
         timeout=10
     )
     response.raise_for_status()
     return response.json()
+
+
+with st.sidebar:
+    st.header("Account")
+
+    if st.session_state.access_token:
+        st.success(f"Logged in as {st.session_state.user_email}")
+
+        if st.button("Logout"):
+            st.session_state.access_token = None
+            st.session_state.user_email = None
+            st.rerun()
+
+    else:
+        auth_tab, register_tab = st.tabs(["Login", "Register"])
+
+        with auth_tab:
+            with st.form("login_form"):
+                login_email = st.text_input("Email", key="login_email")
+                login_password = st.text_input(
+                    "Password",
+                    type="password",
+                    key="login_password"
+                )
+
+                login_submitted = st.form_submit_button("Login")
+
+                if login_submitted:
+                    if not login_email or not login_password:
+                        st.warning("Email and password are required.")
+                    else:
+                        try:
+                            token_data = login_user(
+                                email=login_email,
+                                password=login_password
+                            )
+
+                            st.session_state.access_token = token_data[
+                                "access_token"
+                            ]
+
+                            user = get_current_user()
+                            st.session_state.user_email = user["email"]
+
+                            st.success("Login successful.")
+                            st.rerun()
+
+                        except requests.exceptions.RequestException as error:
+                            st.error(f"Login failed: {error}")
+
+        with register_tab:
+            with st.form("register_form"):
+                register_email = st.text_input(
+                    "Email",
+                    key="register_email"
+                )
+                register_full_name = st.text_input(
+                    "Full name",
+                    key="register_full_name"
+                )
+                register_password = st.text_input(
+                    "Password",
+                    type="password",
+                    key="register_password"
+                )
+
+                register_submitted = st.form_submit_button("Create Account")
+
+                if register_submitted:
+                    if not register_email or not register_password:
+                        st.warning("Email and password are required.")
+                    elif len(register_password) < 8:
+                        st.warning("Password must be at least 8 characters.")
+                    else:
+                        try:
+                            register_user(
+                                email=register_email,
+                                full_name=register_full_name,
+                                password=register_password
+                            )
+
+                            st.success(
+                                "Account created successfully. "
+                                "Please log in."
+                            )
+
+                        except requests.exceptions.RequestException as error:
+                            st.error(f"Registration failed: {error}")
+
+
+if not st.session_state.access_token:
+    st.info("Please log in or create an account to manage job applications.")
+    st.stop()
 
 
 try:
@@ -91,7 +245,7 @@ try:
 except requests.exceptions.RequestException:
     st.error(
         "Cannot connect to the FastAPI backend. "
-        "Make sure the API is running at http://127.0.0.1:8000"
+        "Make sure the API is running."
     )
     st.stop()
 

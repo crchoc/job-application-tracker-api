@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import Optional
 
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 
 class ApplicationStatus(str, Enum):
@@ -25,6 +25,34 @@ class SortBy(str, Enum):
     location = "location"
 
 
+class UserCreate(BaseModel):
+    email: EmailStr
+    full_name: Optional[str] = Field(None, max_length=100)
+    password: str = Field(..., min_length=8)
+
+
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
+
+
+class User(BaseModel):
+    id: int
+    email: EmailStr
+    full_name: Optional[str] = None
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+
+class TokenData(BaseModel):
+    email: Optional[str] = None
+
+
 class JobApplicationCreate(BaseModel):
     company: str = Field(..., min_length=1, max_length=100)
     position: str = Field(..., min_length=1, max_length=100)
@@ -45,6 +73,7 @@ class JobApplicationUpdate(BaseModel):
 
 class JobApplication(JobApplicationCreate):
     id: int
+    user_id: int
 
     model_config = ConfigDict(from_attributes=True)
 

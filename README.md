@@ -350,10 +350,6 @@ streamlit run frontend/streamlit_app.py
 
 ![API Documentation](screenshots/api-docs.PNG)
 
-### Example Application Endpoint
-
-![Applications Endpoint](screenshots/applications-endpoint.PNG)
-
 ### Streamlit Dashboard
 
 ![Streamlit Dashboard](screenshots/streamlit-dashboard.PNG)
